@@ -14,7 +14,7 @@ from datetime import datetime
 from openpyxl import Workbook
 from bs4 import BeautifulSoup
 
-save_excel = True #Change to "True" to save email into Excel
+save_excel = True  # Change to "True" to save email into Excel
 
 book = Workbook()
 sheet = book.active
@@ -23,16 +23,18 @@ sheet = book.active
 def start_scrape(page, name_the_file):
 
     print("\n\nWebpage is currently being scrapped... please wait...")
-       
+
     scrape = BeautifulSoup(page, 'html.parser')
     scrape = scrape.get_text()
-    
-    
-    emails = set(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape))
+
+    # "set" removes duplicates
+    emails = set(re.findall(
+        r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape))
 
     nodupemail = len(list(emails))
 
-    dupemail = len(list(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape)))
+    dupemail = len(
+        list(re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,3}", scrape)))
 
     number_of_dup_email = int(dupemail) - int(nodupemail)
 
@@ -51,11 +53,12 @@ def start_scrape(page, name_the_file):
         for row in zip(email_list):
             sheet.append(row)
         excel_file = (name_the_file + ".xlsx")
-        book.save(excel_file) 
-       
+        book.save(excel_file)
+
     print("\nDuplicates have been removed from list.")
     print("Total email addresses: ", nodupemail)
-    print("There were " + str(number_of_dup_email) + " duplicate email addresses.")
+    print("There were " + str(number_of_dup_email) +
+          " duplicate email addresses.")
 
     if save_excel:
         print("\n\nData has been stored inside of an Excel spreadsheet named: "
@@ -64,21 +67,25 @@ def start_scrape(page, name_the_file):
         print("\nCompleted at: " + str(datetime.fromtimestamp(mod_time)))
         print("\nSize of file: " + str(os.stat(excel_file).st_size) + " KB")
 
+
 def main():
 
-    webpage = input("Paste the webpage you would like to scrape (include http/https): ")
+    webpage = input(
+        "Paste the webpage you would like to scrape (include http/https): ")
 
     if save_excel:
-        name_the_file = input("Name the file you would like to save the data in (don't include .xlsx): ")
+        name_the_file = input(
+            "Name the file you would like to save the data in (don't include .xlsx): ")
 
     try:
-        page = urlopen(webpage) 
+        page = urlopen(webpage)
         start_scrape(page)
     except:
         hdr = {'User-Agent': 'Mozilla/5.0'}
         req = Request(webpage, headers=hdr)
         page = urlopen(req)
         start_scrape(page, name_the_file)
+
 
 if __name__ == "__main__":
     main()
